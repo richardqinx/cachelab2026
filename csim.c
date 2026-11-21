@@ -12,7 +12,7 @@
 struct cache_line
 {
   uint64_t tag;
-  uint32_t last_access_time;
+  uint64_t last_access_time;
   unsigned int valid : 1;
   unsigned int dirty : 1;
 };
@@ -45,11 +45,11 @@ cache_get_set (const struct cache *c, int set_idx)
 static inline int
 cache_extract_set_index (const struct cache *c, uint64_t addr)
 {
-  if (c->s == 20)
+  if (c->s == 0)
     {
       return 0;
     }
-  return (int)((addr >> c->b) & ((1u << c->s) - 1));
+  return (int)((addr >> c->b) & ((1ULL << c->s) - 1));
 }
 
 /* 从 64 位内存地址解析出 Tag */
@@ -104,7 +104,7 @@ cache_destroy (struct cache *c)
 
 /* 在指定 set 中查找 tag 匹配的有效 line，命中返回 way 索引，未命中返回 -1 */
 static int
-cache_set_fint_hit (const struct cache_line *set_lines, int assoc,
+cache_set_find_hit (const struct cache_line *set_lines, int assoc,
                     uint64_t tag)
 {
   int i;
@@ -172,7 +172,7 @@ cache_access(struct cache *c, uint64_t addr, int8_t is_write)
   tag = cache_extract_tag (c, addr);
   set_lines = cache_get_set (c, set_idx);
 
-  hit_way = cache_set_fint_hit (set_lines, c->assoc, tag);
+  hit_way = cache_set_find_hit (set_lines, c->assoc, tag);
 
   if (hit_way != -1)
     {
@@ -273,7 +273,7 @@ main (int argc, char *argv[])
     }
 
 
-  if (s <= 0 || E <= 0 || b <= 0 || tracefile == NULL)
+  if (s < 0 || E <= 0 || b < 0 || tracefile == NULL)
     {
       fprintf(stderr, "%s: Missing required command line argument\n", argv[0]);
       print_help (argv[0]);
