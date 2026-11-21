@@ -1,8 +1,8 @@
 # CacheLab 报告
 
-姓名：xxx
+姓名：秦骏齐
 
-学号：xxx
+学号：2025203019
 
 | csim 分数（/100） | case1 speedup | case2 speedup | case3 speedup | weighted speedup | Part B 性能分（/100） |
 | --- | --- | --- | --- | --- | --- |
